@@ -1,0 +1,138 @@
+package escondb
+
+import (
+	"database/sql"
+
+	"github.com/SERV4BIZ/gfp/jsons"
+)
+
+// ESCONDB is connection object
+type ESCONDB struct {
+	DB *sql.DB
+
+	Type     string
+	Host     string
+	Port     int
+	Username string
+	Password string
+	Database string
+}
+
+// Ping is test connection
+func (me *ESCONDB) Ping() error {
+	return me.DB.Ping()
+}
+
+// Close is close connection
+func (me *ESCONDB) Close() error {
+	return me.DB.Close()
+}
+
+// Query is fetch data from query sql
+func (me *ESCONDB) Query(txtSQL string) (*jsons.JSONArray, error) {
+	dbRows, errRows := me.DB.Query(txtSQL)
+	if errRows != nil {
+		return nil, errRows
+	}
+	defer dbRows.Close()
+
+	arrColTypes, errColtypes := dbRows.ColumnTypes()
+	if errColtypes != nil {
+		return nil, errColtypes
+	}
+
+	arrColumns, errColumns := dbRows.Columns()
+	if errColumns != nil {
+		return nil, errColumns
+	}
+
+	getData := make([]interface{}, len(arrColumns))
+	getDataPointers := make([]interface{}, len(arrColumns))
+
+	for index := range arrColumns {
+		getDataPointers[index] = &getData[index]
+	}
+
+	jsaList := jsons.JSONArrayFactory()
+	for dbRows.Next() {
+		errGet := dbRows.Scan(getDataPointers...)
+		if errGet != nil {
+			return nil, errGet
+		}
+		jsaList.PutObject(me.RawDataToJSONObject(arrColumns, arrColTypes, getData))
+	}
+
+	return jsaList, nil
+}
+
+// Exec is run single sql and return effect number data
+func (me *ESCONDB) Exec(txtSQL string) (*jsons.JSONObject, error) {
+	dbResult, errResult := me.DB.Exec(txtSQL)
+	if errResult != nil {
+		return nil, errResult
+	}
+
+	intInsertID, errInsertID := dbResult.LastInsertId()
+	if errInsertID != nil {
+		intInsertID = -1
+	}
+
+	intAffected, errAffected := dbResult.RowsAffected()
+	if errAffected != nil {
+		intAffected = -1
+	}
+
+	jsoItem := jsons.JSONObjectFactory()
+	jsoItem.PutInt("int_insertid", int(intInsertID))
+	jsoItem.PutInt("int_affected", int(intAffected))
+	return jsoItem, nil
+}
+
+// Fetch is run single sql and return first data row
+func (me *ESCONDB) Fetch(txtSQL string) (*jsons.JSONObject, error) {
+	dbRows, errRows := me.DB.Query(txtSQL)
+	if errRows != nil {
+		return nil, errRows
+	}
+	defer dbRows.Close()
+
+	arrColTypes, errColtypes := dbRows.ColumnTypes()
+	if errColtypes != nil {
+		return nil, errColtypes
+	}
+
+	arrColumns, errColumns := dbRows.Columns()
+	if errColumns != nil {
+		return nil, errColumns
+	}
+
+	getData := make([]interface{}, len(arrColumns))
+	getDataPointers := make([]interface{}, len(arrColumns))
+
+	for index := range arrColumns {
+		getDataPointers[index] = &getData[index]
+	}
+
+	if dbRows.Next() {
+		errGet := dbRows.Scan(getDataPointers...)
+		if errGet != nil {
+			return nil, errGet
+		}
+		return me.RawDataToJSONObject(arrColumns, arrColTypes, getData), nil
+	}
+
+	return nil, sql.ErrNoRows
+}
+
+// Begin is create tx object
+func (me *ESCONDB) Begin() (*ESCONTX, error) {
+	tx, err := me.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	contx := new(ESCONTX)
+	contx.DB = me
+	contx.TX = tx
+	return contx, nil
+}
