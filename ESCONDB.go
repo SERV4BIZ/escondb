@@ -2,7 +2,11 @@ package escondb
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
+	"strings"
 
+	"github.com/SERV4BIZ/escondb/utility"
 	"github.com/SERV4BIZ/gfp/jsons"
 )
 
@@ -26,6 +30,19 @@ func (me *ESCONDB) Ping() error {
 // Close is close connection
 func (me *ESCONDB) Close() error {
 	return me.DB.Close()
+}
+
+// Begin is create tx object
+func (me *ESCONDB) Begin() (*ESCONTX, error) {
+	tx, err := me.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	contx := new(ESCONTX)
+	contx.DB = me
+	contx.TX = tx
+	return contx, nil
 }
 
 // Query is fetch data from query sql
@@ -124,15 +141,166 @@ func (me *ESCONDB) Fetch(txtSQL string) (*jsons.JSONObject, error) {
 	return nil, sql.ErrNoRows
 }
 
-// Begin is create tx object
-func (me *ESCONDB) Begin() (*ESCONTX, error) {
-	tx, err := me.DB.Begin()
-	if err != nil {
-		return nil, err
+// FindRow is query and listing row from database
+func (me *ESCONDB) FindRow(txtTableName, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONArray, error) {
+	txtLimit := ""
+	if intLimit > 0 {
+		txtLimit = fmt.Sprint("LIMIT ", intLimit)
 	}
 
-	contx := new(ESCONTX)
-	contx.DB = me
-	contx.TX = tx
-	return contx, nil
+	txtWhere := ""
+	if jsoCondition.Length() > 0 {
+		txtWhere = "WHERE"
+		arrColumns := jsoCondition.GetKeys()
+		for _, columnName := range arrColumns {
+			switch jsoCondition.GetType(columnName) {
+			case "string":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetString(columnName)), "'", " AND ")
+			case "int":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetInt(columnName), " AND ")
+			case "double":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetDouble(columnName), " AND ")
+			case "bool":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetBool(columnName), " AND ")
+			case "null":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " IS NULL AND ")
+			case "object":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetObject(columnName).ToString()), "'", " AND ")
+			case "array":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetArray(columnName).ToString()), "'", " AND ")
+			}
+		}
+
+		txtWhere = strings.TrimSpace(txtWhere)
+		txtWhere = strings.Trim(txtWhere, "AND")
+	}
+
+	txtColumn := "*"
+	if jsaColumn.Length() > 0 {
+		txtColumn = ""
+		for i := 0; i < jsaColumn.Length(); i++ {
+			txtColumn = strings.TrimSpace(strings.Trim(jsaColumn.GetString(i), ","))
+		}
+		txtColumn = strings.TrimSpace(strings.Trim(txtColumn, ","))
+	}
+
+	txtSQL := fmt.Sprint("SELECT ", txtColumn, " FROM ", txtTableName, " ", txtWhere, " ", txtLimit)
+	return me.Query(strings.TrimSpace(txtSQL))
+}
+
+// GetRow is query and get row from database
+func (me *ESCONDB) GetRow(txtTableName, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject) (*jsons.JSONObject, error) {
+	txtWhere := ""
+	if jsoCondition.Length() > 0 {
+		txtWhere = "WHERE"
+		arrColumns := jsoCondition.GetKeys()
+		for _, columnName := range arrColumns {
+			switch jsoCondition.GetType(columnName) {
+			case "string":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetString(columnName)), "'", " AND ")
+			case "int":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetInt(columnName), " AND ")
+			case "double":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetDouble(columnName), " AND ")
+			case "bool":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetBool(columnName), " AND ")
+			case "null":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " IS NULL AND ")
+			case "object":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetObject(columnName).ToString()), "'", " AND ")
+			case "array":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetArray(columnName).ToString()), "'", " AND ")
+			}
+		}
+
+		txtWhere = strings.TrimSpace(txtWhere)
+		txtWhere = strings.Trim(txtWhere, "AND")
+	}
+
+	txtColumn := "*"
+	if jsaColumn.Length() > 0 {
+		txtColumn = ""
+		for i := 0; i < jsaColumn.Length(); i++ {
+			txtColumn = strings.TrimSpace(strings.Trim(jsaColumn.GetString(i), ","))
+		}
+		txtColumn = strings.TrimSpace(strings.Trim(txtColumn, ","))
+	}
+
+	txtSQL := fmt.Sprint("SELECT ", txtColumn, " FROM ", txtTableName, " ", txtWhere, " LIMIT 1")
+	return me.Fetch(strings.TrimSpace(txtSQL))
+}
+
+// AddRow is add json object to database
+func (me *ESCONDB) AddRow(txtTableName, jsoData *jsons.JSONObject) (*jsons.JSONObject, error) {
+	if jsoData.Length() == 0 {
+		return nil, errors.New("Data row is empty")
+	}
+
+	arrColumns := jsoData.GetKeys()
+	txtColumns := ""
+	txtValues := ""
+	for _, columnName := range arrColumns {
+		txtColumns = fmt.Sprint(txtColumns, columnName, ",")
+
+		switch jsoData.GetType(columnName) {
+		case "string":
+			txtValues = fmt.Sprint(txtValues, "'", utility.AddQuote(jsoData.GetString(columnName)), "'", ",")
+		case "int":
+			txtValues = fmt.Sprint(txtValues, jsoData.GetInt(columnName), ",")
+		case "double":
+			txtValues = fmt.Sprint(txtValues, jsoData.GetDouble(columnName), ",")
+		case "bool":
+			txtValues = fmt.Sprint(txtValues, jsoData.GetBool(columnName), ",")
+		case "null":
+			txtValues = fmt.Sprint(txtValues, columnName, " IS NULL,")
+		case "object":
+			txtValues = fmt.Sprint(txtValues, "'", utility.AddQuote(jsoData.GetObject(columnName).ToString()), "'", ",")
+		case "array":
+			txtValues = fmt.Sprint(txtValues, "'", utility.AddQuote(jsoData.GetArray(columnName).ToString()), "'", ",")
+		}
+	}
+	txtColumns = strings.TrimSpace(strings.Trim(txtColumns, ","))
+	txtValues = strings.TrimSpace(strings.Trim(txtValues, ","))
+
+	txtSQL := fmt.Sprint("INSERT INTO ", txtTableName, " (", txtColumns, ") VALUES (", txtValues, ")")
+	return me.Exec(txtSQL)
+}
+
+// DeleteRow is delete in table from database by condition and limit
+func (me *ESCONDB) DeleteRow(txtTableName, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
+
+	txtLimit := ""
+	if intLimit > 0 {
+		txtLimit = fmt.Sprint("LIMIT ", intLimit)
+	}
+
+	txtWhere := ""
+	if jsoCondition.Length() > 0 {
+		txtWhere = "WHERE"
+		arrColumns := jsoCondition.GetKeys()
+		for _, columnName := range arrColumns {
+			switch jsoCondition.GetType(columnName) {
+			case "string":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetString(columnName)), "'", " AND ")
+			case "int":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetInt(columnName), " AND ")
+			case "double":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetDouble(columnName), " AND ")
+			case "bool":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetBool(columnName), " AND ")
+			case "null":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " IS NULL AND ")
+			case "object":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetObject(columnName).ToString()), "'", " AND ")
+			case "array":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetArray(columnName).ToString()), "'", " AND ")
+			}
+		}
+
+		txtWhere = strings.TrimSpace(txtWhere)
+		txtWhere = strings.Trim(txtWhere, "AND")
+	}
+
+	txtSQL := fmt.Sprint("DELETE FROM ", txtTableName, " ", txtWhere, " ", txtLimit)
+	return me.Exec(strings.TrimSpace(txtSQL))
 }

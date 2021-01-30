@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	dbConn, errConn := escondb.Connect("postgresql", "localhost", 5432, "postgres", "12345678", "dbname")
+	dbConn, errConn := escondb.Connect("postgresql", "localhost", 5432, "postgres", "Qaz74100!", "beebber")
 	if errConn != nil {
 		panic(errConn)
 	}

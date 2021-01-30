@@ -15,7 +15,7 @@ func (me *ESCONDB) RawDataToJSONObject(arrColumns []string, arrColumTypes []*sql
 		if val == nil {
 			jsoItem.PutNull(arrColumns[i])
 		} else {
-			if me.Type == "POSTGRES" || me.Type == "POSTGRESQL" || me.Type == "PGSQL" {
+			if me.Type == "POSTGRESQL" {
 				txtType := strings.ToUpper(arrColumTypes[i].DatabaseTypeName())
 				if strings.HasPrefix(txtType, "TEXT") {
 					jsoItem.PutString(arrColumns[i], val.(string))
