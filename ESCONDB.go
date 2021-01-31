@@ -304,3 +304,72 @@ func (me *ESCONDB) DeleteRow(txtTableName, jsoCondition *jsons.JSONObject, intLi
 	txtSQL := fmt.Sprint("DELETE FROM ", txtTableName, " ", txtWhere, " ", txtLimit)
 	return me.Exec(strings.TrimSpace(txtSQL))
 }
+
+// UpdateRow is update in table from database by condition and limit
+func (me *ESCONDB) UpdateRow(txtTableName, jsoData *jsons.JSONObject, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
+
+	// set data
+	if jsoData.Length() == 0 {
+		return nil, errors.New("Data row is empty")
+	}
+
+	txtSet := ""
+	arrColumns := jsoData.GetKeys()
+	for _, columnName := range arrColumns {
+		switch jsoData.GetType(columnName) {
+		case "string":
+			txtSet = fmt.Sprint(txtSet, columnName, " = '", utility.AddQuote(jsoData.GetString(columnName)), "',")
+		case "int":
+			txtSet = fmt.Sprint(txtSet, columnName, " = ", jsoData.GetInt(columnName), ",")
+		case "double":
+			txtSet = fmt.Sprint(txtSet, columnName, " = ", jsoData.GetDouble(columnName), ",")
+		case "bool":
+			txtSet = fmt.Sprint(txtSet, columnName, " = ", jsoData.GetBool(columnName), ",")
+		case "null":
+			txtSet = fmt.Sprint(txtSet, columnName, " = NULL,")
+		case "object":
+			txtSet = fmt.Sprint(txtSet, columnName, " = '", utility.AddQuote(jsoData.GetObject(columnName).ToString()), "',")
+		case "array":
+			txtSet = fmt.Sprint(txtSet, columnName, " = '", utility.AddQuote(jsoData.GetArray(columnName).ToString()), "',")
+		}
+	}
+
+	txtSet = strings.TrimSpace(txtSet)
+	txtSet = strings.Trim(txtSet, ",")
+
+	// find data
+	txtLimit := ""
+	if intLimit > 0 {
+		txtLimit = fmt.Sprint("LIMIT ", intLimit)
+	}
+
+	txtWhere := ""
+	if jsoCondition.Length() > 0 {
+		txtWhere = "WHERE"
+		arrColumns := jsoCondition.GetKeys()
+		for _, columnName := range arrColumns {
+			switch jsoCondition.GetType(columnName) {
+			case "string":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetString(columnName)), "'", " AND ")
+			case "int":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetInt(columnName), " AND ")
+			case "double":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetDouble(columnName), " AND ")
+			case "bool":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = ", jsoCondition.GetBool(columnName), " AND ")
+			case "null":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " IS NULL AND ")
+			case "object":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetObject(columnName).ToString()), "'", " AND ")
+			case "array":
+				txtWhere = fmt.Sprint(txtWhere, columnName, " = '", utility.AddQuote(jsoCondition.GetArray(columnName).ToString()), "'", " AND ")
+			}
+		}
+
+		txtWhere = strings.TrimSpace(txtWhere)
+		txtWhere = strings.Trim(txtWhere, "AND")
+	}
+
+	txtSQL := fmt.Sprint("UPDATE ", txtTableName, " SET ", txtSet, "  ", txtWhere, " ", txtLimit)
+	return me.Exec(strings.TrimSpace(txtSQL))
+}
