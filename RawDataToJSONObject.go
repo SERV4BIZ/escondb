@@ -20,7 +20,7 @@ func (me *ESCONDB) RawDataToJSONObject(arrColumns []string, arrColumTypes []*sql
 				if strings.HasPrefix(txtType, "TEXT") {
 					jsoItem.PutString(arrColumns[i], val.(string))
 				} else if strings.HasPrefix(txtType, "NAME") {
-					jsoItem.PutString(arrColumns[i], val.(string))
+					jsoItem.PutString(arrColumns[i], string(val.([]uint8)))
 				} else if strings.HasPrefix(txtType, "CHAR") {
 					jsoItem.PutString(arrColumns[i], val.(string))
 				} else if strings.HasPrefix(txtType, "INT") {
