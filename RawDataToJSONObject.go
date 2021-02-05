@@ -19,6 +19,8 @@ func (me *ESCONDB) RawDataToJSONObject(arrColumns []string, arrColumTypes []*sql
 				txtType := strings.ToUpper(arrColumTypes[i].DatabaseTypeName())
 				if strings.HasPrefix(txtType, "TEXT") {
 					jsoItem.PutString(arrColumns[i], val.(string))
+				} else if strings.HasPrefix(txtType, "NAME") {
+					jsoItem.PutString(arrColumns[i], val.(string))
 				} else if strings.HasPrefix(txtType, "CHAR") {
 					jsoItem.PutString(arrColumns[i], val.(string))
 				} else if strings.HasPrefix(txtType, "INT") {
