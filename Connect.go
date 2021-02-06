@@ -22,9 +22,9 @@ func Connect(txtType string, txtHost string, intPort int, txtUsername string, tx
 	gqConn.Password = txtPassword
 	gqConn.Database = txtDBName
 
-	if gqConn.Type == "POSTGRES" || gqConn.Type == "POSTGRESQL" || gqConn.Type == "PGSQL" {
+	if gqConn.Type == "POSTGRESQL" || gqConn.Type == "POSTGRES" || gqConn.Type == "PGSQL" {
 		gqConn.Type = "POSTGRESQL"
-		
+
 		psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", txtHost, intPort, txtUsername, txtPassword, txtDBName)
 		conn, errConn := sql.Open("postgres", psqlInfo)
 		if errConn != nil {
