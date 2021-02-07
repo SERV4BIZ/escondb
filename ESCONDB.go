@@ -150,7 +150,7 @@ func (me *ESCONDB) FindRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoC
 
 	txtWhere := ""
 	if jsoCondition != nil && jsoCondition.Length() > 0 {
-		txtWhere = "WHERE"
+		txtWhere = "WHERE "
 		arrColumns := jsoCondition.GetKeys()
 		for _, columnName := range arrColumns {
 			switch jsoCondition.GetType(columnName) {
@@ -192,7 +192,7 @@ func (me *ESCONDB) FindRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoC
 func (me *ESCONDB) GetRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject) (*jsons.JSONObject, error) {
 	txtWhere := ""
 	if jsoCondition != nil && jsoCondition.Length() > 0 {
-		txtWhere = "WHERE"
+		txtWhere = "WHERE "
 		arrColumns := jsoCondition.GetKeys()
 		for _, columnName := range arrColumns {
 			switch jsoCondition.GetType(columnName) {
@@ -227,6 +227,7 @@ func (me *ESCONDB) GetRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCo
 	}
 
 	txtSQL := fmt.Sprint("SELECT ", txtColumn, " FROM ", txtTableName, " ", txtWhere, " LIMIT 1")
+	fmt.Println(txtSQL)
 	return me.Fetch(strings.TrimSpace(txtSQL))
 }
 
@@ -276,7 +277,7 @@ func (me *ESCONDB) DeleteRow(txtTableName string, jsoCondition *jsons.JSONObject
 
 	txtWhere := ""
 	if jsoCondition != nil && jsoCondition.Length() > 0 {
-		txtWhere = "WHERE"
+		txtWhere = "WHERE "
 		arrColumns := jsoCondition.GetKeys()
 		for _, columnName := range arrColumns {
 			switch jsoCondition.GetType(columnName) {
@@ -345,7 +346,7 @@ func (me *ESCONDB) UpdateRow(txtTableName string, jsoData *jsons.JSONObject, jso
 
 	txtWhere := ""
 	if jsoCondition != nil && jsoCondition.Length() > 0 {
-		txtWhere = "WHERE"
+		txtWhere = "WHERE "
 		arrColumns := jsoCondition.GetKeys()
 		for _, columnName := range arrColumns {
 			switch jsoCondition.GetType(columnName) {
