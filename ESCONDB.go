@@ -227,7 +227,6 @@ func (me *ESCONDB) GetRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCo
 	}
 
 	txtSQL := fmt.Sprint("SELECT ", txtColumn, " FROM ", txtTableName, " ", txtWhere, " LIMIT 1")
-	fmt.Println(txtSQL)
 	return me.Fetch(strings.TrimSpace(txtSQL))
 }
 
