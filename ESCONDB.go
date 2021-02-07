@@ -142,14 +142,14 @@ func (me *ESCONDB) Fetch(txtSQL string) (*jsons.JSONObject, error) {
 }
 
 // FindRow is query and listing row from database
-func (me *ESCONDB) FindRow(txtTableName, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONArray, error) {
+func (me *ESCONDB) FindRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONArray, error) {
 	txtLimit := ""
 	if intLimit > 0 {
 		txtLimit = fmt.Sprint("LIMIT ", intLimit)
 	}
 
 	txtWhere := ""
-	if jsoCondition.Length() > 0 {
+	if jsoCondition != nil && jsoCondition.Length() > 0 {
 		txtWhere = "WHERE"
 		arrColumns := jsoCondition.GetKeys()
 		for _, columnName := range arrColumns {
@@ -176,7 +176,7 @@ func (me *ESCONDB) FindRow(txtTableName, jsaColumn *jsons.JSONArray, jsoConditio
 	}
 
 	txtColumn := "*"
-	if jsaColumn.Length() > 0 {
+	if jsaColumn != nil && jsaColumn.Length() > 0 {
 		txtColumn = ""
 		for i := 0; i < jsaColumn.Length(); i++ {
 			txtColumn = strings.TrimSpace(strings.Trim(jsaColumn.GetString(i), ","))
@@ -189,9 +189,9 @@ func (me *ESCONDB) FindRow(txtTableName, jsaColumn *jsons.JSONArray, jsoConditio
 }
 
 // GetRow is query and get row from database
-func (me *ESCONDB) GetRow(txtTableName, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject) (*jsons.JSONObject, error) {
+func (me *ESCONDB) GetRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject) (*jsons.JSONObject, error) {
 	txtWhere := ""
-	if jsoCondition.Length() > 0 {
+	if jsoCondition != nil && jsoCondition.Length() > 0 {
 		txtWhere = "WHERE"
 		arrColumns := jsoCondition.GetKeys()
 		for _, columnName := range arrColumns {
@@ -218,7 +218,7 @@ func (me *ESCONDB) GetRow(txtTableName, jsaColumn *jsons.JSONArray, jsoCondition
 	}
 
 	txtColumn := "*"
-	if jsaColumn.Length() > 0 {
+	if jsaColumn != nil && jsaColumn.Length() > 0 {
 		txtColumn = ""
 		for i := 0; i < jsaColumn.Length(); i++ {
 			txtColumn = strings.TrimSpace(strings.Trim(jsaColumn.GetString(i), ","))
@@ -231,8 +231,8 @@ func (me *ESCONDB) GetRow(txtTableName, jsaColumn *jsons.JSONArray, jsoCondition
 }
 
 // AddRow is add json object to database
-func (me *ESCONDB) AddRow(txtTableName, jsoData *jsons.JSONObject) (*jsons.JSONObject, error) {
-	if jsoData.Length() == 0 {
+func (me *ESCONDB) AddRow(txtTableName string, jsoData *jsons.JSONObject) (*jsons.JSONObject, error) {
+	if jsoData == nil || jsoData.Length() == 0 {
 		return nil, errors.New("Data row is empty")
 	}
 
@@ -267,7 +267,7 @@ func (me *ESCONDB) AddRow(txtTableName, jsoData *jsons.JSONObject) (*jsons.JSONO
 }
 
 // DeleteRow is delete in table from database by condition and limit
-func (me *ESCONDB) DeleteRow(txtTableName, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
+func (me *ESCONDB) DeleteRow(txtTableName string, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
 
 	txtLimit := ""
 	if intLimit > 0 {
@@ -275,7 +275,7 @@ func (me *ESCONDB) DeleteRow(txtTableName, jsoCondition *jsons.JSONObject, intLi
 	}
 
 	txtWhere := ""
-	if jsoCondition.Length() > 0 {
+	if jsoCondition != nil && jsoCondition.Length() > 0 {
 		txtWhere = "WHERE"
 		arrColumns := jsoCondition.GetKeys()
 		for _, columnName := range arrColumns {
@@ -306,10 +306,10 @@ func (me *ESCONDB) DeleteRow(txtTableName, jsoCondition *jsons.JSONObject, intLi
 }
 
 // UpdateRow is update in table from database by condition and limit
-func (me *ESCONDB) UpdateRow(txtTableName, jsoData *jsons.JSONObject, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
+func (me *ESCONDB) UpdateRow(txtTableName string, jsoData *jsons.JSONObject, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
 
 	// set data
-	if jsoData.Length() == 0 {
+	if jsoData == nil || jsoData.Length() == 0 {
 		return nil, errors.New("Data row is empty")
 	}
 
@@ -344,7 +344,7 @@ func (me *ESCONDB) UpdateRow(txtTableName, jsoData *jsons.JSONObject, jsoConditi
 	}
 
 	txtWhere := ""
-	if jsoCondition.Length() > 0 {
+	if jsoCondition != nil && jsoCondition.Length() > 0 {
 		txtWhere = "WHERE"
 		arrColumns := jsoCondition.GetKeys()
 		for _, columnName := range arrColumns {
