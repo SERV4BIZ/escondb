@@ -281,12 +281,7 @@ func (me *ESCONDB) AddRow(txtTableName string, jsoData *jsons.JSONObject) (*json
 }
 
 // DeleteRow is delete in table from database by condition and limit
-func (me *ESCONDB) DeleteRow(txtTableName string, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
-
-	txtLimit := ""
-	if intLimit > 0 {
-		txtLimit = fmt.Sprint("LIMIT ", intLimit)
-	}
+func (me *ESCONDB) DeleteRow(txtTableName string, jsoCondition *jsons.JSONObject) (*jsons.JSONObject, error) {
 
 	txtWhere := ""
 	if jsoCondition != nil && jsoCondition.Length() > 0 {
@@ -315,12 +310,12 @@ func (me *ESCONDB) DeleteRow(txtTableName string, jsoCondition *jsons.JSONObject
 		txtWhere = strings.Trim(txtWhere, "AND")
 	}
 
-	txtSQL := fmt.Sprint("DELETE FROM ", txtTableName, " ", txtWhere, " ", txtLimit)
+	txtSQL := fmt.Sprint("DELETE FROM ", txtTableName, " ", txtWhere)
 	return me.Exec(strings.TrimSpace(txtSQL))
 }
 
 // UpdateRow is update in table from database by condition and limit
-func (me *ESCONDB) UpdateRow(txtTableName string, jsoData *jsons.JSONObject, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
+func (me *ESCONDB) UpdateRow(txtTableName string, jsoData *jsons.JSONObject, jsoCondition *jsons.JSONObject) (*jsons.JSONObject, error) {
 
 	// set data
 	if jsoData == nil || jsoData.Length() == 0 {
@@ -352,11 +347,6 @@ func (me *ESCONDB) UpdateRow(txtTableName string, jsoData *jsons.JSONObject, jso
 	txtSet = strings.Trim(txtSet, ",")
 
 	// find data
-	txtLimit := ""
-	if intLimit > 0 {
-		txtLimit = fmt.Sprint("LIMIT ", intLimit)
-	}
-
 	txtWhere := ""
 	if jsoCondition != nil && jsoCondition.Length() > 0 {
 		txtWhere = "WHERE "
@@ -384,6 +374,6 @@ func (me *ESCONDB) UpdateRow(txtTableName string, jsoData *jsons.JSONObject, jso
 		txtWhere = strings.Trim(txtWhere, "AND")
 	}
 
-	txtSQL := fmt.Sprint("UPDATE ", txtTableName, " SET ", txtSet, "  ", txtWhere, " ", txtLimit)
+	txtSQL := fmt.Sprint("UPDATE ", txtTableName, " SET ", txtSet, "  ", txtWhere)
 	return me.Exec(strings.TrimSpace(txtSQL))
 }
