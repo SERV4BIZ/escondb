@@ -262,7 +262,7 @@ func (me *ESCONTX) AddRow(txtTableName string, jsoData *jsons.JSONObject) (*json
 }
 
 // DeleteRow is delete in table from database by condition and limit
-func (me *ESCONTX) DeleteRow(txtTableName string, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
+func (me *ESCONTX) DeleteRow(txtTableName string, jsoCondition *jsons.JSONObject) (*jsons.JSONObject, error) {
 	txtWhere := ""
 	if jsoCondition != nil && jsoCondition.Length() > 0 {
 		txtWhere = "WHERE "
@@ -295,8 +295,7 @@ func (me *ESCONTX) DeleteRow(txtTableName string, jsoCondition *jsons.JSONObject
 }
 
 // UpdateRow is update in table from database by condition and limit
-func (me *ESCONTX) UpdateRow(txtTableName string, jsoData *jsons.JSONObject, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONObject, error) {
-
+func (me *ESCONTX) UpdateRow(txtTableName string, jsoData *jsons.JSONObject, jsoCondition *jsons.JSONObject) (*jsons.JSONObject, error) {
 	// set data
 	if jsoData == nil || jsoData.Length() == 0 {
 		return nil, errors.New("Data row is empty")
