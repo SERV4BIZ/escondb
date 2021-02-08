@@ -142,10 +142,30 @@ func (me *ESCONDB) Fetch(txtSQL string) (*jsons.JSONObject, error) {
 }
 
 // FindRow is query and listing row from database
-func (me *ESCONDB) FindRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject, intLimit int) (*jsons.JSONArray, error) {
+func (me *ESCONDB) FindRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject, jsoSort *jsons.JSONObject, intLimit int) (*jsons.JSONArray, error) {
 	txtLimit := ""
 	if intLimit > 0 {
 		txtLimit = fmt.Sprint("LIMIT ", intLimit)
+	}
+
+	txtSort := ""
+	if jsoSort != nil && jsoSort.Length() > 0 {
+		txtSort = "ORDER BY "
+		arrColumns := jsoSort.GetKeys()
+		for _, columnName := range arrColumns {
+			if jsoSort.GetType(columnName) == "bool" {
+				if jsoSort.GetBool(columnName) {
+					txtSort = fmt.Sprint(txtSort, columnName, " DESC,")
+				} else {
+					txtSort = fmt.Sprint(txtSort, columnName, " ASC,")
+				}
+			} else {
+				txtSort = fmt.Sprint(txtSort, columnName, ",")
+			}
+		}
+
+		txtSort = strings.TrimSpace(txtSort)
+		txtSort = strings.Trim(txtSort, ",")
 	}
 
 	txtWhere := ""
@@ -184,7 +204,7 @@ func (me *ESCONDB) FindRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoC
 		txtColumn = strings.TrimSpace(strings.Trim(txtColumn, ","))
 	}
 
-	txtSQL := fmt.Sprint("SELECT ", txtColumn, " FROM ", txtTableName, " ", txtWhere, " ", txtLimit)
+	txtSQL := fmt.Sprint("SELECT ", txtColumn, " FROM ", txtTableName, " ", txtWhere, " ", txtSort, " ", txtLimit)
 	return me.Query(strings.TrimSpace(txtSQL))
 }
 
