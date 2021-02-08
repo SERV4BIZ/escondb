@@ -211,6 +211,20 @@ func (me *ESCONTX) GetRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCo
 	return me.Fetch(strings.TrimSpace(txtSQL))
 }
 
+// ExistRow is query check have any one row from condition
+func (me *ESCONTX) ExistRow(txtTableName string, jsoCondition *jsons.JSONObject) error {
+	var jsaColumn *jsons.JSONArray = nil
+	if jsoCondition != nil && jsoCondition.Length() > 0 {
+		jsaColumn = jsons.ArrayNew()
+		arrColumns := jsoCondition.GetKeys()
+		for _, columnName := range arrColumns {
+			jsaColumn.PutString(columnName)
+		}
+	}
+	_, err := me.GetRow(txtTableName, jsaColumn, jsoCondition)
+	return err
+}
+
 // AddRow is add json object to database
 func (me *ESCONTX) AddRow(txtTableName string, jsoData *jsons.JSONObject) (*jsons.JSONObject, error) {
 	if jsoData == nil || jsoData.Length() == 0 {
