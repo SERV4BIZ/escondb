@@ -180,7 +180,7 @@ func (me *ESCONTX) FindRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoC
 	if jsaColumn != nil && jsaColumn.Length() > 0 {
 		txtColumn = ""
 		for i := 0; i < jsaColumn.Length(); i++ {
-			txtColumn = strings.TrimSpace(strings.Trim(jsaColumn.GetString(i), ","))
+			txtColumn = fmt.Sprint(txtColumn, strings.TrimSpace(strings.Trim(jsaColumn.GetString(i), ",")))
 		}
 		txtColumn = strings.TrimSpace(strings.Trim(txtColumn, ","))
 	}
@@ -222,7 +222,7 @@ func (me *ESCONTX) GetRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCo
 	if jsaColumn != nil && jsaColumn.Length() > 0 {
 		txtColumn = ""
 		for i := 0; i < jsaColumn.Length(); i++ {
-			txtColumn = strings.TrimSpace(strings.Trim(jsaColumn.GetString(i), ","))
+			txtColumn = fmt.Sprint(txtColumn, strings.TrimSpace(strings.Trim(jsaColumn.GetString(i), ",")))
 		}
 		txtColumn = strings.TrimSpace(strings.Trim(txtColumn, ","))
 	}
