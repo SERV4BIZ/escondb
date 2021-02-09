@@ -122,6 +122,12 @@ func (me *ESCONTX) Fetch(txtSQL string) (*jsons.JSONObject, error) {
 	return nil, sql.ErrNoRows
 }
 
+// Exist is query check have any one row
+func (me *ESCONTX) Exist(txtSQL string) error {
+	_, err := me.Fetch(txtSQL)
+	return err
+}
+
 // FindRow is query and listing row from database
 func (me *ESCONTX) FindRow(txtTableName string, jsaColumn *jsons.JSONArray, jsoCondition *jsons.JSONObject, jsoSort *jsons.JSONObject, intLimit int) (*jsons.JSONArray, error) {
 	txtLimit := ""
