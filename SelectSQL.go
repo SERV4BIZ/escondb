@@ -19,12 +19,12 @@ func SelectSQL(txtTable string, txtColumn string, txtWhere string, txtSort strin
 		txtSort = fmt.Sprint(" ORDER BY ", txtSort)
 	}
 
-	txtOffset := 0
+	txtOffset := ""
 	if intOffset >= 0 {
 		txtOffset = fmt.Sprint(" OFFSET ", intOffset)
 	}
 
-	txtLimit := 0
+	txtLimit := ""
 	if intLimit >= 0 {
 		txtLimit = fmt.Sprint(" LIMIT ", intLimit)
 	}
