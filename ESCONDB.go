@@ -175,6 +175,6 @@ func (me *ESCONDB) FetchRow(txtTable string, txtColumn string, txtWhere string) 
 
 // ExistRow is check data row from database
 func (me *ESCONDB) ExistRow(txtTable string, txtWhere string) error {
-	_, err := FetchRow(txtTable, "*", txtWhere)
+	_, err := me.FetchRow(txtTable, "*", txtWhere)
 	return err
 }

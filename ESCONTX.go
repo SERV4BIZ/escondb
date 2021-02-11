@@ -156,6 +156,6 @@ func (me *ESCONTX) FetchRow(txtTable string, txtColumn string, txtWhere string) 
 
 // ExistRow is check data row from database
 func (me *ESCONTX) ExistRow(txtTable string, txtWhere string) error {
-	_, err := FetchRow(txtTable, "*", txtWhere)
+	_, err := me.FetchRow(txtTable, "*", txtWhere)
 	return err
 }
