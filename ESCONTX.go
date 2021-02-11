@@ -123,3 +123,39 @@ func (me *ESCONTX) Exist(txtSQL string) error {
 	_, err := me.Fetch(txtSQL)
 	return err
 }
+
+// SelectRow is select data row from database
+func (me *ESCONTX) SelectRow(txtTable string, txtColumn string, txtWhere string, txtSort string, intOffset int, intLimit int) (*jsons.JSONArray, error) {
+	txtSQL := SelectSQL(txtTable, txtColumn, txtWhere, txtSort, intOffset, intLimit)
+	return me.Query(txtSQL)
+}
+
+// InsertRow is insert data data to database
+func (me *ESCONTX) InsertRow(txtTable string, jsoData *jsons.JSONObject) (*jsons.JSONObject, error) {
+	txtSQL := InsertSQL(txtTable, jsoData)
+	return me.Exec(txtSQL)
+}
+
+// UpdateRow is updata data in database
+func (me *ESCONTX) UpdateRow(txtTable string, jsoData *jsons.JSONObject, txtWhere string) (*jsons.JSONObject, error) {
+	txtSQL := UpdateSQL(txtTable, jsoData, txtWhere)
+	return me.Exec(txtSQL)
+}
+
+// DeleteRow is delete data in database
+func (me *ESCONTX) DeleteRow(txtTable string, txtWhere string) (*jsons.JSONObject, error) {
+	txtSQL := DeleteSQL(txtTable, txtWhere)
+	return me.Exec(txtSQL)
+}
+
+// FetchRow is get first select data row from database
+func (me *ESCONTX) FetchRow(txtTable string, txtColumn string, txtWhere string) (*jsons.JSONObject, error) {
+	txtSQL := SelectSQL(txtTable, txtColumn, txtWhere, "", -1, 1)
+	return me.Fetch(txtSQL)
+}
+
+// ExistRow is check data row from database
+func (me *ESCONTX) ExistRow(txtTable string, txtWhere string) error {
+	_, err := FetchRow(txtTable, "*", txtWhere)
+	return err
+}
