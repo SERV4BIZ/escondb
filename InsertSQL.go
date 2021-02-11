@@ -16,7 +16,7 @@ func InsertSQL(txtTable string, jsoData *jsons.JSONObject) string {
 		txtColumns = fmt.Sprint(txtColumns, columnName, ",")
 		switch jsoData.GetType(columnName) {
 		case "string":
-			txtValues = fmt.Sprint(txtValues, "'", AddQuote(jsoData.GetString(columnName)), "'", ",")
+			txtValues = fmt.Sprint(txtValues, Quote(jsoData.GetString(columnName)), ",")
 		case "int":
 			txtValues = fmt.Sprint(txtValues, jsoData.GetInt(columnName), ",")
 		case "double":
@@ -26,9 +26,9 @@ func InsertSQL(txtTable string, jsoData *jsons.JSONObject) string {
 		case "null":
 			txtValues = fmt.Sprint(txtValues, columnName, " IS NULL,")
 		case "object":
-			txtValues = fmt.Sprint(txtValues, "'", AddQuote(jsoData.GetObject(columnName).ToString()), "'", ",")
+			txtValues = fmt.Sprint(txtValues, Quote(jsoData.GetObject(columnName).ToString()), ",")
 		case "array":
-			txtValues = fmt.Sprint(txtValues, "'", AddQuote(jsoData.GetArray(columnName).ToString()), "'", ",")
+			txtValues = fmt.Sprint(txtValues, Quote(jsoData.GetArray(columnName).ToString()), ",")
 		}
 	}
 	txtColumns = strings.TrimSpace(strings.Trim(txtColumns, ","))

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SERV4BIZ/escondb/utility"
 	"github.com/SERV4BIZ/gfp/jsons"
 )
 
@@ -15,7 +14,7 @@ func UpdateSQL(txtTable string, jsoData *jsons.JSONObject, txtWhere string) stri
 	for _, columnName := range arrColumns {
 		switch jsoData.GetType(columnName) {
 		case "string":
-			txtSet = fmt.Sprint(txtSet, columnName, " = '", utility.AddQuote(jsoData.GetString(columnName)), "',")
+			txtSet = fmt.Sprint(txtSet, columnName, " = ", Quote(jsoData.GetString(columnName)), ",")
 		case "int":
 			txtSet = fmt.Sprint(txtSet, columnName, " = ", jsoData.GetInt(columnName), ",")
 		case "double":
@@ -25,9 +24,9 @@ func UpdateSQL(txtTable string, jsoData *jsons.JSONObject, txtWhere string) stri
 		case "null":
 			txtSet = fmt.Sprint(txtSet, columnName, " = NULL,")
 		case "object":
-			txtSet = fmt.Sprint(txtSet, columnName, " = '", utility.AddQuote(jsoData.GetObject(columnName).ToString()), "',")
+			txtSet = fmt.Sprint(txtSet, columnName, " = ", Quote(jsoData.GetObject(columnName).ToString()), ",")
 		case "array":
-			txtSet = fmt.Sprint(txtSet, columnName, " = '", utility.AddQuote(jsoData.GetArray(columnName).ToString()), "',")
+			txtSet = fmt.Sprint(txtSet, columnName, " = ", Quote(jsoData.GetArray(columnName).ToString()), ",")
 		}
 	}
 	txtSet = strings.TrimSpace(txtSet)
