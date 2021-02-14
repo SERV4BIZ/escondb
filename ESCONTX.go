@@ -159,3 +159,12 @@ func (me *ESCONTX) ExistRow(txtTable string, txtWhere string) error {
 	_, err := me.FetchRow(txtTable, "*", txtWhere)
 	return err
 }
+
+// CountRow is count all row in database by condition
+func (me *ESCONTX) CountRow(txtTable string, txtWhere string) (int, error) {
+	jsoRow, err := me.FetchRow(txtTable, "count(*) as int_count", txtWhere)
+	if err != nil {
+		return -1, err
+	}
+	return jsoRow.GetInt("int_count"), nil
+}
