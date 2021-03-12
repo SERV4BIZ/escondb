@@ -1,0 +1,8 @@
+github.com/SERV4BIZ/gfp/collection v0.0.0-20210302062410-766954048867 h1:06pFg2A36nC1GDXQR8Ercs7hbhHpOjzNHNuJwbKNQg4=
+github.com/SERV4BIZ/gfp/collection v0.0.0-20210302062410-766954048867/go.mod h1:q5gv++CP8OOYitARxvTn7w78B5KSdsRbfZNJP5hukVk=
+github.com/SERV4BIZ/gfp/files v0.0.0-20210302062410-766954048867 h1:Ii4MxMkvoTYKisDFEjSSbiZXFPuzkapZMo5HkNBwTTQ=
+github.com/SERV4BIZ/gfp/files v0.0.0-20210302062410-766954048867/go.mod h1:ZDFxg0rNOeNT/uGGvG2YQ395F6x9yQd5rV6RR0Rjkfg=
+github.com/SERV4BIZ/gfp/jsons v0.0.0-20210302062410-766954048867 h1:JCbjyrFOcIkVlkoSoq/P1tdh/gPkPy2U7tVcnBySck8=
+github.com/SERV4BIZ/gfp/jsons v0.0.0-20210302062410-766954048867/go.mod h1:3tIMUd3nUCI3CD15dkNb1FiiCrEPjdRHoIcafHyMkNc=
+github.com/lib/pq v1.10.0 h1:Zx5DJFEYQXio93kgXnQ09fXNiUKsqv4OUEu2UtGcB1E=
+github.com/lib/pq v1.10.0/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
